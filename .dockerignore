@@ -3,3 +3,5 @@ build
 .git
 .idea
 *.iml
+target
+node_modules

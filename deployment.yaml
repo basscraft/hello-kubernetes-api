@@ -14,10 +14,30 @@ spec:
     spec:
       containers:
       - name: hello-kubernetes-api
-        image: hello-kubernetes-api:latest
-        imagePullPolicy: Never
+        image: basscraft/hello-kubernetes-api:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        # 1. 환경 변수 주입 (Logback에서 사용)
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # 2. 볼륨 마운트 (컨테이너 내부 경로)
+        volumeMounts:
+        - name: log-volume
+          mountPath: /logs
+      # 3. 볼륨 정의 (호스트 경로)
+      volumes:
+      - name: log-volume
+        hostPath:
+          path: /var/log/hello-k8s  # 노드에 생성될 로그 디렉토리
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
