@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 환경 변수 가져오기 (없으면 UNKNOWN) -->
+    <springProperty scope="context" name="NODE_NAME" source="NODE_NAME" defaultValue="UNKNOWN_NODE"/>
+    <springProperty scope="context" name="POD_NAME" source="POD_NAME" defaultValue="UNKNOWN_POD"/>
+
+    <!-- 로그 파일 경로 (컨테이너 내부) -->
+    <property name="LOG_FILE" value="/logs/app.log"/>
+
+    <!-- 1. 콘솔 출력 Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] [%property{NODE_NAME}:%property{POD_NAME}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 2. 파일 출력 Appender (Rolling 정책 적용) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] [%property{NODE_NAME}:%property{POD_NAME}] %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 날짜별로 로그 파일 분리 및 압축 -->
+            <fileNamePattern>/logs/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- 30일간 보관 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 로깅 레벨 설정 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
