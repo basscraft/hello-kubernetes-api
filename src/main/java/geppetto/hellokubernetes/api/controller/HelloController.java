@@ -11,8 +11,22 @@ import java.util.Map;
 public class HelloController {
 
     @GetMapping("/")
-    public Map<String, String> hello() {
-        log.info("Hello Kubernetes! (CI/CD Success)");
+    public String hello() {
+        String podName = System.getenv("HOSTNAME");
+        if (podName == null || podName.isEmpty()) {
+            try {
+                podName = java.net.InetAddress.getLocalHost().getHostName();
+            } catch (java.net.UnknownHostException e) {
+                podName = "unknown";
+            }
+        }
+        String greeting  = "Hello from Spring Boot on Hybrid K8s!!! (Running on " + podName + ")"; /* greeting */
+        log.info(greeting); /* log 추가 */
+        return greeting;
+    }
+
+    @GetMapping("/infos")
+    public Map<String, String> infos() {
         return Map.of(
                 "message", "Hello Kubernetes! (CI/CD Success)",
                 "java_version", System.getProperty("java.version"),
